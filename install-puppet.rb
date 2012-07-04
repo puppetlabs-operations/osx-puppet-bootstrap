@@ -21,12 +21,16 @@ opts = OptionParser.new do |opt|
 
   opt.on('--server=val', "The puppetmaster to connect to.",
                          "Default: puppet.domainname") do |server|
-    options[:certname] = certname
+    options[:server] = server
   end
 
   opt.on('--basedir', "The directory containing the Facter and Puppet source.",
                        "Default: The directory containing this file (#{options[:basedir]})") do |basedir|
     options[:basedir] = basedir
+  end
+
+  opt.on('--noop', "Only print the command to be exec'd") do
+    options[:noop] = true
   end
 
   opt.on('-h', '--help', 'Display this help.') do
@@ -46,20 +50,31 @@ end
 #WELL WOULDN'T IT BE FUCKING NICE IF FACES WERE ACTUALLY FUCKING FUNCTIONAL IN
 #THE SLIGHTEST CAPACITY. FUCK
 
-$LOADPATH << File.join(options[:basedir], 'facter', 'lib')
-#$LOADPATH << File.join(options[:basedir], 'puppet', 'lib')
+$LOAD_PATH << File.join(options[:basedir], 'src', 'facter', 'lib')
+#$LOADPATH << File.join(options[:basedir], 'src', 'puppet', 'lib')
 
 begin
   require 'facter'
 
   Facter.loadfacts
 
+  basedir = options[:basedir]
+
   options[:server]     ||= "puppet." + Facter.value(:domain)
-  options[:certname]   ||= Facter.value(:certname)
+  options[:certname]   ||= Facter.value(:sp_serial_number).downcase
 
   ENV['RUBYLIB'] = "#{basedir}/facter/lib:#{basedir}/puppet/lib"
-  #Kernel.exec %{#{basedir}/puppet/bin/puppet agent -t --waitforcert 1 --server #{options[:server]} --certname #{options[:certname]}}
-  puts %{#{basedir}/puppet/bin/puppet agent -t --waitforcert 1 --server #{options[:server]} --certname #{options[:certname]}}
+  interp = %{ruby -I#{basedir}/src/facter/lib -I#{basedir}/src/puppet/lib}
+  cmd  = "#{basedir}/src/puppet/bin/puppet"
+  args = %{agent -t --waitforcert 1 --server #{options[:server]} --certname #{options[:certname]}}
+
+  full = [interp, cmd, args].flatten.join ' '
+
+  if options[:noop]
+    puts full
+  else
+    Kernel.exec full
+  end
 
 rescue LoadError => e
   $stderr.puts "Failed while trying to load dependency: #{e}"
@@ -88,4 +103,4 @@ export RUBYLIB
 
 
 
-ruby $puppet --certname 
+$puppet --certname $certname

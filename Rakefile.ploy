@@ -16,5 +16,5 @@ base_directories.each do |dir|
 end
 
 task :install => base_directories do
-  sh "./install-puppet.rb --server ningyo.dc1.puppetlabs.net --installdir #{DESTDIR}"
+  sh "#{File.dirname(__FILE__)}/install-puppet.rb --server ningyo.dc1.puppetlabs.net --installdir #{DESTDIR}"
 end

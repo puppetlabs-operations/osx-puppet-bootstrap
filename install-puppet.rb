@@ -15,7 +15,7 @@ opts = OptionParser.new do |opt|
   opt.separator ""
 
   opt.on('--certname=val', "The certificate name to use when generating a CSR.",
-                           "Default: the OSX serial number") do |certname|
+                           "Default: the OSX install UUID") do |certname|
     options[:certname] = certname
   end
 
@@ -54,7 +54,7 @@ begin
   Facter.loadfacts
 
   server   = (options[:server]   || "puppet." + Facter.value(:domain))
-  certname = (options[:certname] || Facter.value(:sp_serial_number).downcase)
+  certname = (options[:certname] || Facter.value(:sp_platform_uuid).downcase)
 
   interpreter = "ruby -I#{basedir}/src/facter/lib -I#{basedir}/src/puppet/lib"
   cmd         = "#{basedir}/src/puppet/bin/puppet"

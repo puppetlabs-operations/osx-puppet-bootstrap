@@ -1,0 +1,20 @@
+# Build operations environment
+
+DESTDIR = ENV['DESTDIR'] || '/opt/operations'
+
+base_directories = [
+  "#{DESTDIR}/etc",
+  "#{DESTDIR}/etc/puppet",
+  "#{DESTDIR}/lib",
+  "#{DESTDIR}/var",
+  "#{DESTDIR}/var/lib",
+  "#{DESTDIR}/var/lib/puppet",
+]
+
+base_directories.each do |dir|
+  directory dir
+end
+
+task :install => base_directories do
+  sh "./install-puppet.rb --server ningyo.dc1.puppetlabs.net --installdir #{DESTDIR}"
+end

@@ -29,6 +29,11 @@ opts = OptionParser.new do |opt|
     options[:basedir] = basedir
   end
 
+  opt.on('--installdir', "The directory to install puppet into",
+                       "Default: The directory containing this file (#{options[:basedir]})") do |basedir|
+    options[:basedir] = basedir
+  end
+
   opt.on('--noop', "Only print the command to be executed") do
     options[:noop] = true
   end
@@ -46,6 +51,11 @@ rescue => e
   exit 1
 end
 
+unless options[:installdir]
+  $stderr.puts 'installdir not specified'
+  exit 1
+end
+
 begin
   basedir = options[:basedir]
 
@@ -58,7 +68,11 @@ begin
 
   interpreter = "ruby -I#{basedir}/src/facter/lib -I#{basedir}/src/puppet/lib"
   cmd         = "#{basedir}/src/puppet/bin/puppet"
-  args        = "agent -t --waitforcert 1 --server #{server} --certname #{certname} --pluginsync"
+  args        = "agent -t --waitforcert 1 --pluginsync"
+  args       << " --server #{server}"
+  args       << " --certname #{certname}"
+  args       << " --confdir #{installdir}/etc/puppet"
+  args       << " --vardir #{installdir}/var/lib/puppet"
 
   full = "#{interpreter} #{cmd} #{args}"
 

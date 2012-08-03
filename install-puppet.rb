@@ -46,29 +46,21 @@ rescue => e
   exit 1
 end
 
-
-#WELL WOULDN'T IT BE FUCKING NICE IF FACES WERE ACTUALLY FUCKING FUNCTIONAL IN
-#THE SLIGHTEST CAPACITY. FUCK
-
-$LOAD_PATH << File.join(options[:basedir], 'src', 'facter', 'lib')
-#$LOADPATH << File.join(options[:basedir], 'src', 'puppet', 'lib')
-
 begin
-  require 'facter'
-
-  Facter.loadfacts
-
   basedir = options[:basedir]
 
-  options[:server]     ||= "puppet." + Facter.value(:domain)
-  options[:certname]   ||= Facter.value(:sp_serial_number).downcase
+  $LOAD_PATH << "#{basedir}/src/facter/lib"
+  require 'facter'
+  Facter.loadfacts
 
-  ENV['RUBYLIB'] = "#{basedir}/facter/lib:#{basedir}/puppet/lib"
-  interp = %{ruby -I#{basedir}/src/facter/lib -I#{basedir}/src/puppet/lib}
-  cmd  = "#{basedir}/src/puppet/bin/puppet"
-  args = %{agent -t --waitforcert 1 --server #{options[:server]} --certname #{options[:certname]}}
+  server   = (options[:server]   || "puppet." + Facter.value(:domain))
+  certname = (options[:certname] || Facter.value(:sp_serial_number).downcase)
 
-  full = [interp, cmd, args].flatten.join ' '
+  interpreter = "ruby -I#{basedir}/src/facter/lib -I#{basedir}/src/puppet/lib"
+  cmd         = "#{basedir}/src/puppet/bin/puppet"
+  args        = "agent -t --waitforcert 1 --server #{server} --certname #{certname} --pluginsync"
+
+  full = "#{interpreter} #{cmd} #{args}"
 
   if options[:noop]
     puts full

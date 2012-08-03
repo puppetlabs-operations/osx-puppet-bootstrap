@@ -11,7 +11,7 @@ options = {
 
 opts = OptionParser.new do |opt|
 
-  opt.banner = "Usage: #{$0} [--certname NAME] [--server NAME] [--basedir DIRECTORY]"
+  opt.banner = "Usage: #{File.basename($0)} [--certname NAME] [--server NAME] [--basedir DIRECTORY]"
   opt.separator ""
 
   opt.on('--certname=val', "The certificate name to use when generating a CSR.",
@@ -29,7 +29,7 @@ opts = OptionParser.new do |opt|
     options[:basedir] = basedir
   end
 
-  opt.on('--noop', "Only print the command to be exec'd") do
+  opt.on('--noop', "Only print the command to be executed") do
     options[:noop] = true
   end
 

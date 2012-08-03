@@ -3,11 +3,7 @@
 DESTDIR = ENV['DESTDIR'] || '/opt/operations'
 
 base_directories = [
-  "#{DESTDIR}/etc",
   "#{DESTDIR}/etc/puppet",
-  "#{DESTDIR}/lib",
-  "#{DESTDIR}/var",
-  "#{DESTDIR}/var/lib",
   "#{DESTDIR}/var/lib/puppet",
 ]
 

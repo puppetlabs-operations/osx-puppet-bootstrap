@@ -24,14 +24,13 @@ opts = OptionParser.new do |opt|
     options[:server] = server
   end
 
-  opt.on('--basedir', "The directory containing the Facter and Puppet source.",
+  opt.on('--basedir=val', "The directory containing the Facter and Puppet source.",
                        "Default: The directory containing this file (#{options[:basedir]})") do |basedir|
     options[:basedir] = basedir
   end
 
-  opt.on('--installdir', "The directory to install puppet into",
-                       "Default: The directory containing this file (#{options[:basedir]})") do |basedir|
-    options[:basedir] = basedir
+  opt.on('--installdir=val', "The directory to install puppet into") do |installdir|
+    options[:installdir] = installdir
   end
 
   opt.on('--noop', "Only print the command to be executed") do
@@ -57,7 +56,8 @@ unless options[:installdir]
 end
 
 begin
-  basedir = options[:basedir]
+  basedir    = options[:basedir]
+  installdir = options[:installdir]
 
   $LOAD_PATH << "#{basedir}/src/facter/lib"
   require 'facter'

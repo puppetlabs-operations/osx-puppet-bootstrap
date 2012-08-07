@@ -1,16 +1,43 @@
 # Build operations environment
 
+SRCDIR  = ENV['SRCDIR']  || File.expand_path(File.dirname(__FILE))
 DESTDIR = ENV['DESTDIR'] || '/opt/operations'
 
-base_directories = [
-  "#{DESTDIR}/etc/puppet",
-  "#{DESTDIR}/var/lib/puppet",
-]
+directory_map = {
+  :confdir => "#{DESTDIR}/etc/puppet",
+  :ssldir  => "#{DESTDIR}/etc/puppet/ssl",
+  :vardir  => "#{DESTDIR}/var/lib/puppet",
+  :rundir  => "#{DESTDIR}/var/run/puppet",
+  :logdir  => "#{DESTDIR}/var/run/puppet",
+}
 
-base_directories.each do |dir|
+basedirs = directory_map.values
+
+basedirs.each do |dir|
   directory dir
 end
 
-task :install => base_directories do
-  sh "#{File.dirname(__FILE__)}/install-puppet.rb --server ningyo.dc1.puppetlabs.net --installdir #{DESTDIR}"
+task :puppet => [basedirs, :environment].flatten do
+
+  cmd  = "ruby -I#{SRCDIR}/src/facter/lib -I#{SRCDIR}/src/puppet/lib"
+  cmd << "#{SRCDIR}/src/puppet/bin/puppet agent"
+  cmd << "--test --waitforcert 1 --pluginsync"
+  cmd << " --server #{SERVER}"
+  cmd << " --certname #{CERTNAME}"
+
+  directory_map.each_pair do |switch, val|
+    str << " --#{switch} #{val}"
+  end
+
+  sh cmd
+end
+
+task :environment do
+
+  $LOAD_PATH << "#{SRCDIR}/src/facter/lib"
+  require 'facter'
+  Facter.loadfacts
+
+  SERVER = ENV['SERVER']     || 'ningyo.dc1.puppetlabs.net'
+  CERTNAME = ENV['CERTNAME'] || Facter.value(:sp_platform_uuid).downcase
 end

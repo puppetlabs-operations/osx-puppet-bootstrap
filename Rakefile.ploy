@@ -14,6 +14,7 @@ directory_map = {
 }
 
 basedirs = directory_map.values
+basedirs << "#{DESTDIR}/tmp"
 
 basedirs.each do |dir|
   directory dir

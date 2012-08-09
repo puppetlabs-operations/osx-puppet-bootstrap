@@ -1,7 +1,9 @@
 # Build operations environment
 
-SRCDIR  = ENV['SRCDIR']  || File.expand_path(File.dirname(__FILE))
+SRCDIR  = ENV['SRCDIR']  || Dir.pwd
 DESTDIR = ENV['DESTDIR'] || '/opt/operations'
+RUBY    = ENV['RUBY']    || "ruby -I#{SRCDIR}/src/facter/lib -I#{SRCDIR}/src/puppet/lib"
+PUPPET  = ENV['PUPPET']  || "#{SRCDIR}/src/puppet/bin/puppet agent"
 
 directory_map = {
   :confdir => "#{DESTDIR}/etc/puppet",
@@ -19,14 +21,15 @@ end
 
 task :puppet => [basedirs, :environment].flatten do
 
-  cmd  = "ruby -I#{SRCDIR}/src/facter/lib -I#{SRCDIR}/src/puppet/lib"
-  cmd << "#{SRCDIR}/src/puppet/bin/puppet agent"
-  cmd << "--test --waitforcert 1 --pluginsync"
+  cmd  = "#{RUBY} #{PUPPET}"
+  cmd << " agent"
+  cmd << " --no-usecacheonfailure --no-splay --verbose --no-daemonize --onetime --waitforcert 1 --pluginsync"
   cmd << " --server #{SERVER}"
   cmd << " --certname #{CERTNAME}"
+  cmd << " --environment macports"
 
   directory_map.each_pair do |switch, val|
-    str << " --#{switch} #{val}"
+    cmd << " --#{switch} #{val}"
   end
 
   sh cmd

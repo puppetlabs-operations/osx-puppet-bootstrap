@@ -1,7 +1,7 @@
 # Whatever
 
-SRCDIR  = ENV['SRCDIR']  || Dir.pwd
-DESTDIR = ENV['DESTDIR'] || File.dirname(__FILE__)
+SRCDIR  = ENV['SRCDIR']  || File.dirname(__FILE__)
+DESTDIR = ENV['DESTDIR'] || Dir.pwd
 
 task :default => ["#{DESTDIR}/src/facter", "#{DESTDIR}/src/puppet", "#{DESTDIR}/Rakefile"]
 

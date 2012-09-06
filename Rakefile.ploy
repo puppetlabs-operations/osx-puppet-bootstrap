@@ -27,7 +27,7 @@ task :puppet => [basedirs, :environment].flatten do
   cmd << " --no-usecacheonfailure --no-splay --verbose --no-daemonize --onetime --waitforcert 1 --pluginsync"
   cmd << " --server #{SERVER}"
   cmd << " --certname #{CERTNAME}"
-  cmd << " --environment macports"
+  cmd << " --environment production"
 
   directory_map.each_pair do |switch, val|
     cmd << " --#{switch} #{val}"

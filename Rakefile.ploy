@@ -10,7 +10,7 @@ directory_map = {
   :ssldir  => "#{DESTDIR}/etc/puppet/ssl",
   :vardir  => "#{DESTDIR}/var/lib/puppet",
   :rundir  => "#{DESTDIR}/var/run/puppet",
-  :logdir  => "#{DESTDIR}/var/run/puppet",
+  :logdir  => "#{DESTDIR}/var/log/puppet",
 }
 
 basedirs = directory_map.values
